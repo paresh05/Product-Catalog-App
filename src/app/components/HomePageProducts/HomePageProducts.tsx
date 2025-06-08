@@ -2,9 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { setToLocalStorage } from "../../utils";
 import { API_ROUTES } from "../../constants/apiRoutes";
-import { STORAGE_KEYS } from "../../constants/storageKeys";
 
 export interface ProductProps {
   id: number;
@@ -14,17 +12,7 @@ export interface ProductProps {
   description: string;
 }
 
-interface HomePageProductsProps {
-  setAddedProducts: React.Dispatch<React.SetStateAction<number[]>>;
-  setCartValue: React.Dispatch<React.SetStateAction<number>>;
-  addedProducts: number[];
-}
-
-export default function HomePageProducts({
-  setAddedProducts,
-  setCartValue,
-  addedProducts,
-}: HomePageProductsProps) {
+export default function HomePageProducts() {
   const router = useRouter();
   const [products, setProducts] = useState<ProductProps[]>([]);
 
@@ -35,24 +23,6 @@ export default function HomePageProducts({
       setProducts(products.products);
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  const handleAddToCart = (product: ProductProps) => {
-    if (addedProducts?.includes(product.id)) {
-      const filteredProducts = addedProducts.filter(
-        (item) => item !== product.id
-      );
-      setCartValue(addedProducts.length - 1);
-      setToLocalStorage(STORAGE_KEYS.CART_VALUE, filteredProducts);
-      setAddedProducts(filteredProducts);
-    } else {
-      setCartValue(addedProducts.length + 1);
-      setToLocalStorage(STORAGE_KEYS.CART_VALUE, [
-        ...addedProducts,
-        product.id,
-      ]);
-      setAddedProducts((prev) => [...prev, product.id]);
     }
   };
 
@@ -78,28 +48,12 @@ export default function HomePageProducts({
           <p className="text-primary font-medium text-base mt-1 text-gray-800">
             ${product?.price}
           </p>
-          <div className="mt-4 flex justify-between w-full">
-            <button
-              className="mt-auto px-4 py-2 bg-blue-600 text-white cursor-pointer rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-              onClick={() =>
-                router.push(`${API_ROUTES.PRODUCTS}/${product?.id}`)
-              }
-            >
-              View Product
-            </button>
-            <button
-              className={`mt-auto px-4 py-2 text-white cursor-pointer rounded-lg transition-colors text-sm font-medium ${
-                addedProducts?.includes(product?.id)
-                  ? "bg-red-600"
-                  : "bg-blue-600"
-              }`}
-              onClick={() => handleAddToCart(product)}
-            >
-              {addedProducts?.includes(product?.id)
-                ? `Remove from Cart`
-                : `Add to Cart`}
-            </button>
-          </div>
+          <button
+            className="mt-4 px-4 py-2 bg-blue-600 text-white cursor-pointer rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            onClick={() => router.push(`${API_ROUTES.PRODUCTS}/${product?.id}`)}
+          >
+            View Product
+          </button>
         </div>
       ))}
     </div>
